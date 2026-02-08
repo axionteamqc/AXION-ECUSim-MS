@@ -1,0 +1,10 @@
+assets
+data\control.json
+data\stop.flag
+data\telemetry.json
+pyproject.toml
+README.md
+requirements.txt
+requirements-dev.txt
+scripts
+src
