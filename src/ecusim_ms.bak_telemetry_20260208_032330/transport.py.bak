@@ -6,7 +6,6 @@ import logging
 from typing import Optional
 
 import can
-from ecusim_ms.transports.termux_libusb_slcan import TermuxUsbSlcan
 
 SLCAN_BITRATE_MAP = {
     10_000: "S0",
@@ -50,52 +49,6 @@ class CanTransport:
         return None
 
 
-class TermuxUsbSlcanTransport(CanTransport):
-    """Android/Termux USB backend using libusb + SLCAN ASCII."""
-
-    def __init__(self, bitrate: int = 500_000) -> None:
-        self.bitrate = bitrate
-        self.dev: Optional[TermuxUsbSlcan] = None
-        self.tx_errors = 0
-
-    def open(self) -> None:
-        import os
-        if self.dev is not None:
-            return
-        if not os.environ.get("TERMUX_USB_FD"):
-            raise RuntimeError("TERMUX_USB_FD not set. Launch via: termux-usb -r -E -e ... <device>")
-        self.dev = TermuxUsbSlcan()
-        cmd = SLCAN_BITRATE_MAP.get(int(self.bitrate), "S6")
-        self.dev.init_slcan(cmd)
-
-    def send(self, frame_id: int, payload: bytes, is_extended: bool = False) -> bool:
-        if self.dev is None:
-            raise RuntimeError("termux-usb device not open")
-        dlc = len(payload)
-        if is_extended:
-            frame = "T%08X%1X%s\r" % (frame_id, dlc, payload.hex().upper())
-        else:
-            frame = "t%03X%1X%s\r" % (frame_id & 0x7FF, dlc, payload.hex().upper())
-        try:
-            self.dev.write_ascii(frame)
-            return True
-        except Exception:
-            self.tx_errors += 1
-            raise
-
-    def recv(self, timeout_s: float | None = 1.0) -> Optional[can.Message]:
-        # Not implemented yet (requires parsing SLCAN receive frames)
-        return None
-
-    def close(self) -> None:
-        if self.dev is not None:
-            self.dev.close()
-            self.dev = None
-
-    def get_state(self) -> str | None:
-        return "OPEN" if self.dev is not None else "CLOSED"
-
-
 class PythonCanTransport(CanTransport):
     """Python-can backend (gs_usb/virtual)."""
 
@@ -104,7 +57,6 @@ class PythonCanTransport(CanTransport):
         self.channel = channel
         self.bitrate = bitrate
         self.bus: Optional[can.BusABC] = None
-        self.termux_usb = None  # Termux USB/libusb SLCAN transport
         self.tx_errors = 0
 
     def open(self) -> None:
@@ -125,19 +77,6 @@ class PythonCanTransport(CanTransport):
                     "On Windows, install driver via Zadig (libusbK)."
                 ) from exc
             try:
-                # --- Termux Android USB (libusb) backend ---
-                if getattr(self, "backend", None) == "termux-usb":
-                    import os
-                    if not os.environ.get("TERMUX_USB_FD"):
-                        raise RuntimeError("TERMUX_USB_FD not set. Launch via: termux-usb -r -E -e ... <device>")
-                    self.termux_usb = TermuxUsbSlcan()
-                    br = int(getattr(self, "bitrate", 500000) or 500000)
-                    br_map = {10000:"S0",20000:"S1",50000:"S2",100000:"S3",125000:"S4",250000:"S5",500000:"S6",800000:"S7",1000000:"S8"}
-                    self.termux_usb.init_slcan(br_map.get(br, "S6"))
-                    self.bus = None
-                    return
-                # ----------------------------------------------
-
                 self.bus = can.Bus(
                     interface="gs_usb",
                     channel=self.channel,
@@ -177,20 +116,6 @@ class PythonCanTransport(CanTransport):
             data=payload,
         )
         try:
-            if getattr(self, "backend", None) == "termux-usb":
-                if not self.termux_usb:
-                    raise RuntimeError("termux-usb transport not initialized")
-                arbid = msg.arbitration_id
-                data = msg.data or b""
-                dlc = len(data)
-                if getattr(msg, "is_extended_id", False):
-                    frame = "T%08X%1X%s\r" % (arbid, dlc, data.hex().upper())
-                else:
-                    frame = "t%03X%1X%s\r" % (arbid & 0x7FF, dlc, data.hex().upper())
-                self.termux_usb.write_ascii(frame)
-                return True
-            
-
             self.bus.send(msg)
             return True
         except can.CanError as exc:

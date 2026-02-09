@@ -41,7 +41,7 @@ def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="ECU Simulator - MegaSquirt Simplified Dash (broadcast only)."
     )
-    parser.add_argument("--iface", default=None, help="CAN interface (gs_usb, virtual, termux-usb).")
+    parser.add_argument("--iface", default=None, help="CAN interface (gs_usb, virtual).")
     parser.add_argument("--channel", type=int, default=None, help="CAN channel/index.")
     parser.add_argument(
         "--backend",
@@ -172,7 +172,7 @@ def _validate_settings(
     skip_bitrate: bool,
 ) -> None:
     if backend == "pythoncan":
-        if iface not in {"gs_usb", "virtual", "termux-usb"}:
+        if iface not in {"gs_usb", "virtual"}:
             raise ValueError(f"Unsupported interface: {iface}")
         validate_bitrate(bitrate)
         return

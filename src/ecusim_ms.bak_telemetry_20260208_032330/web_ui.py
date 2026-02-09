@@ -2,18 +2,9 @@
 
 from __future__ import annotations
 
-import os
-import sys
-
-# Allow running as a script: `python src/ecusim_ms/web_ui.py`
-if __name__ == "__main__" and __package__ is None:
-    sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
 from flask import Flask, jsonify, render_template_string, request
 
 from ecusim_ms.ui_backend import UiBackend
-import threading
-import time
 
 app = Flask(__name__)
 backend = UiBackend()
@@ -88,35 +79,7 @@ INDEX_HTML = """
       .device-row { display: flex; align-items: center; gap: 8px; }
       .device-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
       .device-error { color: #ff9f1c; font-size: 12px; }
-    
-/* TELEMETRY_UI_COMPACT_PATCH */
-#telemetryTable.live-table {
-  max-height: 160px;
-  overflow: auto;
-}
-.telemetry-collapsed {
-  display: none !important;
-}
-#telemetryToggle.btn.btn-small {
-  padding: 6px 10px;
-  font-size: 12px;
-  margin-left: 8px;
-}
-/* END TELEMETRY_UI_COMPACT_PATCH */
-
-
-/* HARD_STOP_PATCH */
-.btn-danger {
-  background: #b00020;
-  border: 1px solid rgba(255,255,255,0.25);
-  color: #fff;
-}
-.btn-danger:active {
-  transform: translateY(1px);
-}
-/* HARD_STOP_PATCH */
-
-</style>
+    </style>
   </head>
   <body>
     <header>
@@ -166,8 +129,6 @@ INDEX_HTML = """
             <span id="telemetryConnected" class="badge badge-idle">Connected</span>
             <span id="telemetryReady" class="badge badge-idle">Ready</span>
             <span id="telemetryRunning" class="badge badge-idle">Running</span>
-            <button id="btnHardStop" class="btn btn-danger" type="button">HARD STOP</button>
-            <button id="telemetryToggle" class="btn btn-small" type="button">Telemetry ▾</button>
           </div>
         </div>
         <div id="telemetryTable" class="live-table"></div>
@@ -200,36 +161,6 @@ INDEX_HTML = """
       const telemetryReadyEl = document.getElementById("telemetryReady");
       const telemetryRunningEl = document.getElementById("telemetryRunning");
       const telemetryTableEl = document.getElementById("telemetryTable");
-
-/* HARD_STOP_PATCH */
-      const hardStopBtn = document.getElementById("btnHardStop");
-      if (hardStopBtn) {
-        hardStopBtn.addEventListener("click", async () => {
-          const ok = confirm("HARD STOP: stop simulator + shutdown server. Continue?");
-          if (!ok) return;
-          try {
-            await fetch("/api/hard_stop", { method: "POST" });
-          } catch (e) {}
-          alert("Server stopped. Use the Android shortcut to start again.");
-        });
-      }
-/* HARD_STOP_PATCH */
-
-/* TELEMETRY_UI_COMPACT_PATCH */
-      const telemetryToggleEl = document.getElementById("telemetryToggle");
-      let telemetryCollapsed = false;
-      function setTelemetryCollapsed(v) {
-        telemetryCollapsed = !!v;
-        if (telemetryTableEl) telemetryTableEl.classList.toggle("telemetry-collapsed", telemetryCollapsed);
-        if (telemetryToggleEl) telemetryToggleEl.textContent = telemetryCollapsed ? "Telemetry ▸" : "Telemetry ▾";
-      }
-      if (telemetryToggleEl) {
-        telemetryToggleEl.addEventListener("click", () => setTelemetryCollapsed(!telemetryCollapsed));
-      }
-      // Par défaut: compact (non replié). Si tu veux replié par défaut sur petit écran:
-      // if (window.innerWidth && window.innerWidth < 520) setTelemetryCollapsed(true);
-/* TELEMETRY_UI_COMPACT_PATCH */
-
       const telemetryUnavailableEl = document.getElementById("telemetryUnavailable");
       let controlsDisabled = false;
       let lastRunning = false;
@@ -284,7 +215,7 @@ INDEX_HTML = """
         if (!raw) {
           return "";
         }
-        const clean = String(raw).replace(/\\s+/g, "").toUpperCase();
+        const clean = String(raw).replace(/\s+/g, "").toUpperCase();
         const parts = clean.match(/.{1,2}/g) || [];
         return parts.join(" ");
       }
@@ -730,30 +661,6 @@ def api_stop():
 def api_status():
     return jsonify(backend.get_status())
 
-
-
-# HARD_STOP_PATCH
-@app.post("/api/hard_stop")
-def api_hard_stop():
-    # Stop the runner (best-effort)
-    try:
-        backend.stop()
-    except Exception:
-        try:
-            r = getattr(backend, "_runner", None)
-            if r:
-                r.stop()
-        except Exception:
-            pass
-
-    # Respond first, then kill server (hard exit)
-    def _exit_soon():
-        time.sleep(0.2)
-        os._exit(0)
-
-    threading.Thread(target=_exit_soon, daemon=True).start()
-    return jsonify({"ok": True})
-# HARD_STOP_PATCH
 
 @app.get("/api/telemetry")
 def api_telemetry():

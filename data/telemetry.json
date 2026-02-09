@@ -1,25 +1,25 @@
 {
-  "ts": 1770530425.0804906,
-  "iface": "virtual",
+  "ts": 1770661901.664811,
+  "iface": "termux-usb",
   "bitrate": 500000,
   "hz": 50.0,
-  "mode": "loop",
+  "mode": "custom",
   "last_error": null,
   "signals": {
-    "map": 100.0,
-    "rpm": 0,
-    "clt": 70.0,
-    "tps": 0.5,
-    "pw1": 0.0,
-    "pw2": 0.0,
-    "mat": 70.0,
-    "adv_deg": 0.0,
+    "map": 72.0,
+    "rpm": 42,
+    "clt": 100.0,
+    "tps": 2.0,
+    "pw1": 2.5,
+    "pw2": 2.5,
+    "mat": 86.0,
+    "adv_deg": 10.0,
     "afrtgt1": 14.700000000000001,
     "AFR1": 14.700000000000001,
     "egocor1": 100.0,
-    "egt1": 200.0,
-    "pwseq1": 0.0,
-    "batt": 12.200000000000001,
+    "egt1": 100.0,
+    "pwseq1": 2.5,
+    "batt": 12.5,
     "sensors1": 0.0,
     "sensors2": 0.0,
     "knk_rtd": 0.0,
@@ -29,92 +29,92 @@
   },
   "signal_meta": {
     "map": {
-      "last_sent_ms": 1770530425019,
-      "raw": "03e8000002bc0005"
+      "last_sent_ms": 1770661901657,
+      "raw": "02d0002a03e80014"
     },
     "rpm": {
-      "last_sent_ms": 1770530425019,
-      "raw": "03e8000002bc0005"
+      "last_sent_ms": 1770661901657,
+      "raw": "02d0002a03e80014"
     },
     "clt": {
-      "last_sent_ms": 1770530425019,
-      "raw": "03e8000002bc0005"
+      "last_sent_ms": 1770661901657,
+      "raw": "02d0002a03e80014"
     },
     "tps": {
-      "last_sent_ms": 1770530425019,
-      "raw": "03e8000002bc0005"
+      "last_sent_ms": 1770661901657,
+      "raw": "02d0002a03e80014"
     },
     "pw1": {
-      "last_sent_ms": 1770530425003,
-      "raw": "0000000002bc0000"
+      "last_sent_ms": 1770661901620,
+      "raw": "09c409c4035c0064"
     },
     "pw2": {
-      "last_sent_ms": 1770530425003,
-      "raw": "0000000002bc0000"
+      "last_sent_ms": 1770661901620,
+      "raw": "09c409c4035c0064"
     },
     "mat": {
-      "last_sent_ms": 1770530425003,
-      "raw": "0000000002bc0000"
+      "last_sent_ms": 1770661901620,
+      "raw": "09c409c4035c0064"
     },
     "adv_deg": {
-      "last_sent_ms": 1770530425003,
-      "raw": "0000000002bc0000"
+      "last_sent_ms": 1770661901620,
+      "raw": "09c409c4035c0064"
     },
     "afrtgt1": {
-      "last_sent_ms": 1770530424940,
-      "raw": "939303e807d00000"
+      "last_sent_ms": 1770661901592,
+      "raw": "939303e803e809c4"
     },
     "AFR1": {
-      "last_sent_ms": 1770530424940,
-      "raw": "939303e807d00000"
+      "last_sent_ms": 1770661901592,
+      "raw": "939303e803e809c4"
     },
     "egocor1": {
-      "last_sent_ms": 1770530424940,
-      "raw": "939303e807d00000"
+      "last_sent_ms": 1770661901592,
+      "raw": "939303e803e809c4"
     },
     "egt1": {
-      "last_sent_ms": 1770530424940,
-      "raw": "939303e807d00000"
+      "last_sent_ms": 1770661901592,
+      "raw": "939303e803e809c4"
     },
     "pwseq1": {
-      "last_sent_ms": 1770530424940,
-      "raw": "939303e807d00000"
+      "last_sent_ms": 1770661901592,
+      "raw": "939303e803e809c4"
     },
     "batt": {
-      "last_sent_ms": 1770530424925,
-      "raw": "007a000000000000"
+      "last_sent_ms": 1770661901586,
+      "raw": "007d000000000000"
     },
     "sensors1": {
-      "last_sent_ms": 1770530424925,
-      "raw": "007a000000000000"
+      "last_sent_ms": 1770661901586,
+      "raw": "007d000000000000"
     },
     "sensors2": {
-      "last_sent_ms": 1770530424925,
-      "raw": "007a000000000000"
+      "last_sent_ms": 1770661901586,
+      "raw": "007d000000000000"
     },
     "knk_rtd": {
-      "last_sent_ms": 1770530424925,
-      "raw": "007a000000000000"
+      "last_sent_ms": 1770661901586,
+      "raw": "007d000000000000"
     },
     "VSS1": {
-      "last_sent_ms": 1770530424415,
+      "last_sent_ms": 1770661901569,
       "raw": "0000000000000000"
     },
     "tc_retard": {
-      "last_sent_ms": 1770530424415,
+      "last_sent_ms": 1770661901569,
       "raw": "0000000000000000"
     },
     "launch_timing": {
-      "last_sent_ms": 1770530424415,
+      "last_sent_ms": 1770661901569,
       "raw": "0000000000000000"
     }
   },
   "clamped": {},
   "faults": {},
   "counters": {
-    "tx_frames": 480,
+    "tx_frames": 170,
     "tx_errors": 0,
     "rx_frames": 0,
-    "bus_state": "SLCAN"
+    "bus_state": "OPEN"
   }
 }

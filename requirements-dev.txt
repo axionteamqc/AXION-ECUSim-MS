@@ -1,4 +1,0 @@
-pyinstaller
-black
-isort
-ruff

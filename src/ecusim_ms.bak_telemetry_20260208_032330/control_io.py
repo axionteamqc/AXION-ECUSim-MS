@@ -3,8 +3,6 @@
 from __future__ import annotations
 
 import json
-import os
-import tempfile
 from pathlib import Path
 from typing import Any, Dict
 
@@ -126,14 +124,8 @@ def read_control_overrides(control_cfg: models.ControlConfig) -> Dict[str, float
     return overrides
 
 
-# ATOMIC_TELEMETRY_PATCH
-
 def save_telemetry_safe(path: Path | str, snapshot: Any) -> None:
-    """Persist telemetry without raising; best-effort only.
-
-    Writes are atomic (write temp + fsync + replace) to avoid readers seeing
-    partially-written JSON (which causes UI parse errors).
-    """
+    """Persist telemetry without raising; best-effort only."""
     try:
         target = Path(path)
         payload: Dict[str, Any]
@@ -146,35 +138,7 @@ def save_telemetry_safe(path: Path | str, snapshot: Any) -> None:
             payload = {}
 
         target.parent.mkdir(parents=True, exist_ok=True)
-
-        # Write into the same directory to keep replace() atomic.
-        fd, tmp_name = tempfile.mkstemp(prefix=target.name + '.', suffix='.tmp', dir=str(target.parent))
-        try:
-            with os.fdopen(fd, 'w', encoding='utf-8') as handle:
-                json.dump(payload, handle, indent=2)
-                handle.flush()
-                try:
-                    os.fsync(handle.fileno())
-                except Exception:
-                    pass
-
-            # Atomic replace (POSIX); also works on Windows.
-            os.replace(tmp_name, str(target))
-
-            # Best-effort: sync directory entry (optional, but cheap).
-            try:
-                dir_fd = os.open(str(target.parent), os.O_RDONLY)
-                try:
-                    os.fsync(dir_fd)
-                finally:
-                    os.close(dir_fd)
-            except Exception:
-                pass
-        finally:
-            try:
-                if tmp_name and Path(tmp_name).exists():
-                    Path(tmp_name).unlink()
-            except Exception:
-                pass
+        with target.open("w", encoding="utf-8") as handle:
+            json.dump(payload, handle, indent=2)
     except Exception:
         return
