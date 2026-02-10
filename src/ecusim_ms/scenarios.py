@@ -104,8 +104,8 @@ def scenario_idle(t: float) -> Dict[str, float]:
     s_knk = math.sin(2 * math.pi * 0.15 * t)
 
     signals = {
-        "map": 40.0 + 2.0 * s_map,
-        "rpm": 900.0 + 30.0 * s_rpm,
+        "map": 100.0 + 1.0 * s_map,  # keep near baro for demo
+        "rpm": 900.0 + 40.0 * s_rpm,
         "clt": 185.0 + 2.0 * s_clt,  # deg F
         "tps": 1.5 + 0.2 * s_tps,
         "pw1": 2.5 + 0.15 * s_pw,
@@ -118,8 +118,8 @@ def scenario_idle(t: float) -> Dict[str, float]:
         "egt1": 500.0 + 30.0 * s_egt,  # deg F
         "pwseq1": 2.5 + 0.15 * s_pw,
         "batt": 14.0 - 0.05 * s_batt,
-        "sensors1": 0.0,
-        "sensors2": 0.0,
+        "sensors1": 280.0 + 10.0 * s_map,
+        "sensors2": 90.0 + 2.0 * s_mat,
         "knk_rtd": max(0.0, 0.5 * s_knk),
         "VSS1": 0.0,
         "tc_retard": 0.0,
@@ -132,7 +132,7 @@ def scenario_pull(t: float) -> Dict[str, float]:
     ramp = _clamp(t / 5.0, 0.0, 1.0)
     afr1 = 14.7 - 2.2 * ramp
     signals = {
-        "map": 45.0 + 55.0 * ramp,
+        "map": 100.0 + 10.0 * ramp,  # ~0-10 kPa above baro for demo
         "rpm": 1000.0 + 7000.0 * ramp,
         "clt": 185.0 + 5.0 * ramp,
         "tps": 2.0 + 93.0 * ramp,
@@ -146,8 +146,8 @@ def scenario_pull(t: float) -> Dict[str, float]:
         "egt1": 520.0 + 650.0 * ramp,  # deg F
         "pwseq1": 3.0 + 8.0 * ramp,
         "batt": 14.0 - 0.2 * ramp,
-        "sensors1": 0.0,
-        "sensors2": 0.0,
+        "sensors1": 300.0 + 220.0 * ramp,
+        "sensors2": 95.0 + 15.0 * ramp,
         "knk_rtd": 0.0,
         "VSS1": 35.0 * ramp,  # m/s
         "tc_retard": 0.0,
